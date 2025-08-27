@@ -1,0 +1,3 @@
+---
+# defaults file for setup-docker
+docker_user: vagrant    

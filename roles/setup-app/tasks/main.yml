@@ -1,0 +1,16 @@
+---
+# tasks file for setup-app
+- name: Check if docker-compose file exists
+  stat:
+    path: "{{ compose_file }}"
+  register: output
+
+- name: Deploy application with Docker Compose
+  community.docker.docker_compose_v2:
+    project_src: "{{ compose_file }}"
+    pull: always
+    state: present
+    build: always
+  become: yes
+  become_user: "{{ docker_user }}"
+  when: output.stat.exists

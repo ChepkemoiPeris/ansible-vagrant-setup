@@ -1,0 +1,13 @@
+---
+# tasks file for install-dependencies   
+- name: Install prerequisite packages
+  apt:
+    name:
+      - ca-certificates
+      - curl
+      - gnupg
+      - lsb-release
+      - apt-transport-https
+      - software-properties-common
+    state: present
+    update_cache: yes
