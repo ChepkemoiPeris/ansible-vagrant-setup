@@ -11,6 +11,6 @@
     pull: always
     state: present
     build: always
-  become: yes
-  become_user: "{{ docker_user }}"
+  become: yes 
   when: output.stat.exists
+ 
