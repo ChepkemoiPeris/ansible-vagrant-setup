@@ -102,5 +102,28 @@ def validate_token_route(token):
     if not ok:
         return "Invalid or expired validation token", 404
     return redirect(url_for('index'))
+
+
+@app.get('/parts/all')
+def parts_all():
+    conn = get_db_conn()
+    if not conn:
+        return jsonify({'error': 'db unavailable'}), 503
+    try:
+        cur = conn.cursor()
+        # Use location as a proxy for category and count distinct descriptions
+        cur.execute(
+            "SELECT location AS category, COUNT(DISTINCT description) AS distinct_descriptions"
+            " FROM parts GROUP BY location ORDER BY RAND()"
+        )
+        rows = []
+        for r in cur.fetchall():
+            rows.append({
+                'category': r[0],
+                'distinct_descriptions': int(r[1]) if r[1] is not None else 0,
+            })
+        return jsonify(rows)
+    finally:
+        conn.close()
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=8000)
