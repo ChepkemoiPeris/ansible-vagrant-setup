@@ -85,6 +85,15 @@ def list_parts(limit: int = 100) -> List[Dict[str, Any]]:
             (limit,),
         )
         for r in cur.fetchall():
+            # created_at may be returned as a datetime or as a string depending on
+            # the DB driver/configuration. Normalize to an ISO string when
+            # possible, otherwise coerce to str.
+            created = None
+            if r[8]:
+                if hasattr(r[8], 'isoformat'):
+                    created = r[8].isoformat()
+                else:
+                    created = str(r[8])
             out.append(
                 {
                     "id": r[0],
@@ -95,7 +104,7 @@ def list_parts(limit: int = 100) -> List[Dict[str, Any]]:
                     "image_url": r[5],
                     "contact_email": r[6],
                     "contact_phone": r[7],
-                    "created_at": r[8].isoformat() if r[8] else None,
+                    "created_at": created,
                 }
             )
         return out
@@ -116,6 +125,13 @@ def get_part(part_id: int) -> Optional[Dict[str, Any]]:
         r = cur.fetchone()
         if not r:
             return None
+        # Normalize created_at as above
+        created = None
+        if r[8]:
+            if hasattr(r[8], 'isoformat'):
+                created = r[8].isoformat()
+            else:
+                created = str(r[8])
         return {
             "id": r[0],
             "title": r[1],
@@ -125,7 +141,7 @@ def get_part(part_id: int) -> Optional[Dict[str, Any]]:
             "image_url": r[5],
             "contact_email": r[6],
             "contact_phone": r[7],
-            "created_at": r[8].isoformat() if r[8] else None,
+            "created_at": created,
             "is_validated": bool(r[9]),
             "validation_token": r[10],
         }
